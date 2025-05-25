@@ -2,10 +2,16 @@
 
 Genea allows visually building and editing a family tree online. It consumes and saves genealogy data in the GEDCOM format without any server side components.
 
+# Fork additional features
+
+* Added Containerfile (Dockerfile equivalent but platform-agnostic)
+* Added podman-compose file
+* Planned uploading GEDCOM file from app data folder mounted in podman-compose
+
 # Demo
 
 * [Genea.app](https://www.genea.app/)
-* [Android](https://play.google.com/store/apps/details?id=com.genea.app)
+* [Android](https://play.google.com/store/apps/details?id=com.genea.app) - No longer exists
 * [Screenshots](#screenshots-and-video)
 
 # Installation
