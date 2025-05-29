@@ -37,7 +37,7 @@
     <div id="genea">
 
         <!-- Start -->
-        <div id="overlay" v-if="page=='start'" class="container" style="max-width: 600px;">
+        <div id="overlay" v-if="page=='start'" class="container" style="max-width: 800px;">
             <h1 class="header">Genea.app</h1>
             <div class="divider"></div>
             <div class="section" v-if="!isNative()">
@@ -74,14 +74,18 @@
                     <i class="material-icons left">create</i>
                     Start new family tree
                 </button>
-                <label class="btn-large waves-effect waves-light" v-on:click="openGitModal('load')">
+                <label class="btn-large waves-effect waves-light" title="Open the saved tree in Git repository" v-on:click="openGitModal('load')">
 					<i class="material-icons left">cloud_download</i>
-					Open
+					Open <small>Git</small>
 				</label>
-                <label class="btn-large waves-effect waves-light">
+                <label class="btn-large waves-effect waves-light" title="Upload from device">
 					<i class="material-icons left">get_app</i>
 					Upload
 					<input type="file" style="display: none;" accept=".gedcom,.ged,.txt" v-on:change="loadFile">
+				</label>
+                <label class="btn-large waves-effect waves-light" title="Load from saved file in the server" v-on:click="loadServerFile()">
+					<i class="material-icons left">storage</i>
+					Load
 				</label>
             </div>
             <div class="section">
@@ -183,6 +187,9 @@
                 </li>
                 <li class="bold sidenav-close" v-if="!isNative()">
                     <a @click.prevent="saveFile();" class="waves-effect waves-teal"><i class="material-icons">save_alt</i>Download</a>
+                </li>
+                <li class="bold sidenav-close" v-if="!isNative()">
+                    <a @click.prevent="saveServerFile();" class="waves-effect waves-teal"><i class="material-icons">storage</i>Save to server</a>
                 </li>
                 <li class="bold sidenav-close" v-if="isNative()">
                     <a @click.prevent="shareFile();" class="waves-effect waves-teal"><i class="material-icons">share</i>Share</a>
@@ -353,7 +360,7 @@
                                 return response.text();
                             }).then(function(data) {
                                 stamboom.load(data);
-                                stamboom.select();
+                                stamboom.select("@I1@");
                             });
                         }
                         if (example == "gedcom1") {
@@ -389,6 +396,24 @@
                             });
                         }
                     }
+                },
+                // Added functionality : Load GEDCOM file from the server
+                loadServerFile: function() {
+                    if (!stamboom.isLoaded || window.confirm("This will clear the family tree you previously had open.")) {
+                        genea.page = "tree";
+                        fetch("data/genea.app.ged").then(function(response) {
+                            return response.text();
+                        }).then(function(data) {
+                            stamboom.load(data);
+                            stamboom.select("@I1@");
+                        }).catch(function(error) {
+                            alert("Error reading file from server.")
+                        });
+                    }
+                },
+                // Added functionality : Save GEDCOM file on the server
+                saveServerFile: function(){
+                    // TODO
                 },
                 close: function() {
                     if ((this.isGitConnected() && !this.git.outstandingChanges) || window.confirm("This will clear the family tree. Changes made will not be saved.")) {
