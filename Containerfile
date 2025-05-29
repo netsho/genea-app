@@ -4,6 +4,9 @@ FROM docker.io/library/nginx:alpine
 # Copy the static site files to the nginx web root
 COPY . /usr/share/nginx/html
 
+# Copy custom configuration file to nginx folder
+COPY  nginx/nginx-app-data.conf /etc/nginx/conf.d
+
 # Expose port 3010 for the web server
 EXPOSE 3010
 
