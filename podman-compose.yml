@@ -3,6 +3,6 @@ services:
         image: localhost/genea-app:latest
         container_name: genea
         volumes:
-          - /etc/genea/data:/app/data
+          - /etc/genea/data:/usr/share/nginx/html/data
         ports:
           - 3010:3010
