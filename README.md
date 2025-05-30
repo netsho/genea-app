@@ -4,13 +4,9 @@ Genea allows visually building and editing a family tree online. It consumes and
 
 # Fork additional features
 
-* Added Containerfile (Dockerfile equivalent but platform-agnostic)
-* Added nginx custom configuration file to serve /app/data folder in the container
-* Added podman-compose file
-* Planned uploading GEDCOM file from app data folder mounted in podman-compose
-* Added tooltip on buttons
-* Added load GEDCOM file from server
-* Added save GEDCOM file to server (in progress)
+* Containerfile (Dockerfile equivalent but platform-agnostic) & podman-compose file.
+* Load GEDCOM mounted file. The file is mounted in podman-compose.
+* Save GEDCOM mounted file.
 
 # Demo
 
