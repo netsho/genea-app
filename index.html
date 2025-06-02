@@ -188,9 +188,6 @@
                 <li class="bold sidenav-close" v-if="!isNative()">
                     <a @click.prevent="saveFile();" class="waves-effect waves-teal"><i class="material-icons">save_alt</i>Download</a>
                 </li>
-                <li class="bold sidenav-close" v-if="!isNative()">
-                    <a @click.prevent="saveServerFile();" class="waves-effect waves-teal"><i class="material-icons">storage</i>Save to server</a>
-                </li>
                 <li class="bold sidenav-close" v-if="isNative()">
                     <a @click.prevent="shareFile();" class="waves-effect waves-teal"><i class="material-icons">share</i>Share</a>
                 </li>
@@ -410,10 +407,6 @@
                             alert("Error reading file from server.")
                         });
                     }
-                },
-                // Added functionality : Save GEDCOM file on the server
-                saveServerFile: function(){
-                    // TODO
                 },
                 close: function() {
                     if ((this.isGitConnected() && !this.git.outstandingChanges) || window.confirm("This will clear the family tree. Changes made will not be saved.")) {
