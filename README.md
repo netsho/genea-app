@@ -6,8 +6,9 @@ Genea allows visually building and editing a family tree online. It consumes and
 
 * Containerfile (Dockerfile equivalent but platform-agnostic) & podman-compose file.
   * `podman build -t genea-app .` 
-* Load GEDCOM mounted file. The file is mounted in podman-compose.
-* Save GEDCOM mounted file.
+* Load GEDCOM mounted file. The file is in mounted folder in podman-compose.
+
+Automatically saving the mounted GEDCOM file is not possible. As an alternative, download the file and manually copy it to the mounted folder.
 
 # Demo
 
