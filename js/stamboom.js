@@ -192,7 +192,14 @@ var Stamboom = (function() {
                         if (!person.name) {
                             person.name = "";
                         }
+                        if(!person.birth){
+                            person.birth = "";
+                        }
+                        if(!person.death){
+                            person.death = "";
+                        }
                         var parts = person.name.split(" ");
+                        var birthAndDeath = `${parseDate(person.birth).getFullYear() || "?"} - ${parseDate(person.death).getFullYear() || ""}`;
                         var output = [""];
                         for (var i = 0; i < parts.length; i++) {
                             if (parts[i].length + (output[output.length - 1]).length > maxLength) {
@@ -201,8 +208,10 @@ var Stamboom = (function() {
                                 output[output.length - 1] = output[output.length - 1] + " " + parts[i];
                             }
                         }
-                        output = output.map(part => { return (part.length < maxLength ? part : part.substr(0, maxLength) + "...") });
-                        return output.join("<br/>");
+                        output = output.map(part => { return (part.length < maxLength ? part : part.substr(0, maxLength) + "...") }).join("<br/>");
+                        output = output.concat("<br/>"); // Empty line to create vertical spacing
+                        output = output.concat(`<br/>${birthAndDeath}`);
+                        return output;
                     },
                     color: function(person) {
                         switch ((person.gender || "").substring(0, 1).toUpperCase()) {
@@ -416,6 +425,15 @@ var Stamboom = (function() {
                 // Attach the handler
                 dragElement.addEventListener('mousedown', dragStart);
                 dragElement.addEventListener('touchstart', dragStart);
+            }
+
+            // Private methods
+            function parseDate(date) {
+                try {
+                    return new Date(date);
+                } catch {
+                    return null;
+                }
             }
 
 	return Stamboom;
