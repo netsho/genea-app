@@ -129,7 +129,6 @@ var Stamboom = (function() {
                 gedcom.removeChild(childId);
             }
 
-
             Stamboom.prototype.onselect = function(callback) {
                 onselectCallback = callback;
             }
