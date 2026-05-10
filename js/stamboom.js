@@ -104,8 +104,8 @@ var Stamboom = (function() {
                 return gedcom.person(id);
             }
 
-            Stamboom.prototype.addPerson = function(givenName, surName, gender) {
-                return gedcom.addPerson(givenName, surName, gender);
+            Stamboom.prototype.addPerson = function(givenName, surName, dateOfBirth, placeOfBirth, gender) {
+                return gedcom.addPerson(givenName, surName, dateOfBirth, placeOfBirth, gender);
             }
 
             Stamboom.prototype.addRelation = function(parent1Id, parent2Id) {
