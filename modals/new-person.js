@@ -89,7 +89,20 @@ Vue.component('new-person', {
                         <div class="col s6">
                             <div class="input-field">
                                 <label for="sex" class="active">Sex</label>
-                                <input id="sex" v-model="newPerson.sex" class="autocomplete" type="text"/>
+                                <div class="radio-group">
+                                    <label class="radio-options">
+                                        <input type="radio" value="M" v-model="newPerson.sex" />
+                                        <span>Male</span>
+                                    </label>
+                                    <label class="radio-options">
+                                        <input type="radio" value="F" v-model="newPerson.sex" />
+                                        <span>Female</span>
+                                    </label>
+                                    <label >
+                                        <input type="radio" value="Other" v-model="newPerson.sex" />
+                                        <span>Other</span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                         <div class="col s12">
