@@ -223,7 +223,6 @@
         </main>
 
         <!-- Modals -->
-        <new-person :person="person" ref="modalNewPerson" />
         <div id="modalGit" class="modal">
             <div class="modal-content">
                 <div class="row">
@@ -231,7 +230,7 @@
                 </div>
                 <div class="row">
                     <p>Connect to a Git Repository to load or save your GEDCOM family tree. You can use a hosted service like <a href="https://github.com/" target="_blank">GitHub</a> or <a href="https://gitlab.com/" target="_blank">GitLab</a>, or connect
-                        to a self hosted repository like <a href="https://gitea.io/" target="_blank">Gitea</a>, <a href="https://gogs.io/" target="_blank">Gogs</a>, or <a href="https://github.com/gitbucket/gitbucket" target="_blank">GitBucket</a>.</p>
+                        to a self hosted repository like <a href="https://gitea.io/" target="_blank">Gitea</a>, <a href="https://gogs.io/" target="_blank">Gogs</a>, <a href="https://github.com/gitbucket/gitbucket" target="_blank">GitBucket</a>, or <a href="https://forgejo.org/" target="_blank">Forgejo</a>.</p>
                 </div>
                 <div class="row">
                     <h4>Connection Details</h4>
@@ -261,6 +260,8 @@
                 <a class="modal-close waves-effect waves-green btn-flat">Close</a>
             </div>
         </div>
+
+        <new-person :person="person" ref="modalNewPerson" />
 
     </div>
 
