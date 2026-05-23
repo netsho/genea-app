@@ -24,6 +24,101 @@ var Stamboom = (function() {
 
             var gedcom = new Gedcom();
 
+            // Node drawing
+            var node = {
+                draw: function(person) {
+                    return `` +
+                        `id="stamboom_${person.id}",` +
+                        (person.id ? `href="#/tree/${person.id}",` : ``) +
+                        `color="${node.color(person)}",` +
+                        (selectedPerson == person.id ? `style="filled,bold",fillcolor="white",` : ``) +
+                        (selectedPerson == person.id ? `class="selectedPerson",` : ``) +
+                        `tooltip="${node.tooltip(person)}",` +
+                        `label=<<table border="2" cellspacing="0" cellpadding="0" fixedsize="true" height="55" width="122">` +
+                        `<tr>` +
+                        `<td border="0" fixedsize="true" height="53" width="45">` +
+                        `<img src="${node.image(person)}" scale="both" />` +
+                        `</td>` +
+                        `<td border="0" fixedsize="true" align="left" width="65">` +
+                        `<b>${node.label(person)}</b>` +
+                        `</td>` +
+                        `<td border="0" fixedsize="true" align="right" width="0" valign="bottom">` +
+                        `${node.icon(person) ? '<img src="' + node.icon(person) + '" />' : ''}` +
+                        `</td>` +
+                        `</tr>` +
+                        `</table>>`;
+                },
+                label: function(person) {
+                    // Format name and split over multiple lines
+                    var maxLength = 15;
+                    if (!person.name) {
+                        person.name = "";
+                    }
+                    if(!person.birth){
+                        person.birth = "";
+                    }
+                    if(!person.death){
+                        person.death = "";
+                    }
+                    var parts = person.name.split(" ");
+                    var birthAndDeath = `${parseDate(person.birth).getFullYear() || "?"} - ${parseDate(person.death).getFullYear() || ""}`;
+                    var output = [""];
+                    for (var i = 0; i < parts.length; i++) {
+                        if (parts[i].length + (output[output.length - 1]).length > maxLength) {
+                            output.push(parts[i]);
+                        } else {
+                            output[output.length - 1] = output[output.length - 1] + " " + parts[i];
+                        }
+                    }
+                    output = output.map(part => { return (part.length < maxLength ? part : part.substr(0, maxLength) + "...") }).join("<br/>");
+                    output = output.concat("<br/>"); // Empty line to create vertical spacing
+                    output = output.concat(`<br/>${birthAndDeath}`);
+                    return output;
+                },
+                color: function(person) {
+                    switch ((person.gender || "").substring(0, 1).toUpperCase()) {
+                        case "F":
+                            return "pink";
+                        case "M":
+                            return "lightblue";
+                        case "U":
+                            return "lightgray";
+                        case "":
+                            return "lightgray";
+                        default:
+                            return "olivedrab3";
+                    }
+                },
+                image: function(person) {
+                    return "img/unknown.png";
+                },
+                icon: function(person) {
+                    if (!person || !person.id) return '';
+                    var rels = gedcom.relations(person.id);
+                    var hasSpouse = rels && rels.length > 0;
+                    var hasChildren = false;
+                    for (var i = 0; i < rels.length; i++) {
+                        if (rels[i].children && rels[i].children.length > 0) {
+                            hasChildren = true;
+                            break;
+                        }
+                    }
+                    if (hasSpouse && hasChildren) return 'img/tree-spouse-children.png';
+                    if (hasSpouse) return 'img/tree-spouse.png';
+                    if (hasChildren) return 'img/tree-children.png';
+                    return '';
+                },
+                tooltip: function(person) {
+                    var tooltip = person.name || '';
+                    var birth = person.birth || '';
+                    var death = person.death || '';
+                    if (birth || death) {
+                        tooltip += '\n' + birth + ' - ' + death;
+                    }
+                    return tooltip;
+                }
+            }
+
             // Public properties
             this.isLoaded = false;
 
@@ -133,6 +228,10 @@ var Stamboom = (function() {
                 onselectCallback = callback;
             }
 
+            Stamboom.prototype.printTree = function(){
+                printTree();
+            }
+
             // Private methods
             function init() {
                 family = Object.assign({}, blankFamily);
@@ -162,101 +261,7 @@ var Stamboom = (function() {
                     }
                     return false;
                 }
-                // Node drawing
-                var node = {
-                    draw: function(person) {
-                        return `` +
-                            `id="stamboom_${person.id}",` +
-                            (person.id ? `href="#/tree/${person.id}",` : ``) +
-                            `color="${node.color(person)}",` +
-                            (selectedPerson == person.id ? `style="filled,bold",fillcolor="white",` : ``) +
-                            (selectedPerson == person.id ? `class="selectedPerson",` : ``) +
-                            `tooltip="${node.tooltip(person)}",` +
-                            `label=<<table border="2" cellspacing="0" cellpadding="0" fixedsize="true" height="55" width="122">` +
-                            `<tr>` +
-                            `<td border="0" fixedsize="true" height="53" width="45">` +
-                            `<img src="${node.image(person)}" scale="both" />` +
-                            `</td>` +
-                            `<td border="0" fixedsize="true" align="left" width="65">` +
-                            `<b>${node.label(person)}</b>` +
-                            `</td>` +
-                            `<td border="0" fixedsize="true" align="right" width="0" valign="bottom">` +
-                            `${node.icon(person) ? '<img src="' + node.icon(person) + '" />' : ''}` +
-                            `</td>` +
-                            `</tr>` +
-                            `</table>>`;
-                    },
-                    label: function(person) {
-                        // Format name and split over multiple lines
-                        var maxLength = 15;
-                        if (!person.name) {
-                            person.name = "";
-                        }
-                        if(!person.birth){
-                            person.birth = "";
-                        }
-                        if(!person.death){
-                            person.death = "";
-                        }
-                        var parts = person.name.split(" ");
-                        var birthAndDeath = `${parseDate(person.birth).getFullYear() || "?"} - ${parseDate(person.death).getFullYear() || ""}`;
-                        var output = [""];
-                        for (var i = 0; i < parts.length; i++) {
-                            if (parts[i].length + (output[output.length - 1]).length > maxLength) {
-                                output.push(parts[i]);
-                            } else {
-                                output[output.length - 1] = output[output.length - 1] + " " + parts[i];
-                            }
-                        }
-                        output = output.map(part => { return (part.length < maxLength ? part : part.substr(0, maxLength) + "...") }).join("<br/>");
-                        output = output.concat("<br/>"); // Empty line to create vertical spacing
-                        output = output.concat(`<br/>${birthAndDeath}`);
-                        return output;
-                    },
-                    color: function(person) {
-                        switch ((person.gender || "").substring(0, 1).toUpperCase()) {
-                            case "F":
-                                return "pink";
-                            case "M":
-                                return "lightblue";
-                            case "U":
-                                return "lightgray";
-                            case "":
-                                return "lightgray";
-                            default:
-                                return "olivedrab3";
-                        }
-                    },
-                    image: function(person) {
-                        return "img/unknown.png";
-                    },
-                    icon: function(person) {
-                        if (!person || !person.id) return '';
-                        var rels = gedcom.relations(person.id);
-                        var hasSpouse = rels && rels.length > 0;
-                        var hasChildren = false;
-                        for (var i = 0; i < rels.length; i++) {
-                            if (rels[i].children && rels[i].children.length > 0) {
-                                hasChildren = true;
-                                break;
-                            }
-                        }
-                        if (hasSpouse && hasChildren) return 'img/tree-spouse-children.png';
-                        if (hasSpouse) return 'img/tree-spouse.png';
-                        if (hasChildren) return 'img/tree-children.png';
-                        return '';
-                    },
-                    tooltip: function(person) {
-                        var tooltip = person.name || '';
-                        var birth = person.birth || '';
-                        var death = person.death || '';
-                        if (birth || death) {
-                            tooltip += '\n' + birth + ' - ' + death;
-                        }
-                        return tooltip;
-                    }
-                }
-
+                
                 // Preprocess
                 if (!family.relations || family.relations.length == 0) {
                     family.relations = [];
@@ -381,6 +386,156 @@ var Stamboom = (function() {
                     if (this.document.getElementsByClassName("selectedPerson")[0]) {
                         this.document.getElementsByClassName("selectedPerson")[0].scrollIntoView({ behavior: "auto", inline: "center", block: "center" });
                     }
+                }).catch(function (err) {
+                    console.error(err.message)
+                });
+            }
+
+            function printTree() {  
+                // Dot graph definition              
+                var dotToPrint =
+                    `digraph G {` + `\n` +
+                    `graph [nodesep=0.15,splines=ortho,ranksep=0.35]` + `\n` +
+                    //`graph [nodesep=0.15,splines=true,ranksep=0.35,overlap=false]` + `\n` +
+                    //`rankdir=TB` + `\n` +
+                    `node [shape=box,fontname=Helvetica,fontsize=8,fixedsize=true,width=1.7,height=0.75,style=filled]` + `\n` +
+                    `\n// ----- Settings -----\n` +
+                    `node[color=green, label="", width=0, height=0];` + `\n` +
+                    `edge[arrowtail=none, arrowhead=none, color=cornflowerblue];` + `\n`;
+
+                var persons = gedcom.getPersons();
+
+                // Draw each person
+                persons.forEach(person => {
+                    if(!person || !person.id){
+                        return;
+                    }
+                    dotToPrint += `Person [${node.draw(person)}]` + `\n`;
+                });
+                
+                // Draw relations
+                
+
+
+                var drawnRelations = [];
+
+                persons.forEach(function(person) {
+
+                    if (!person || !person.id) {
+                        return;
+                    }
+
+                    var relations = gedcom.relations(person.id);
+
+                    if (!relations || relations.length === 0) {
+                        return;
+                    }
+
+                    relations.forEach(function(relation, x) {
+
+                        if (!relation.partner || !relation.partner.id) {
+                            return;
+                        }
+
+                        // Prevent duplicate couple rendering
+                        var relationKey =
+                            [person.id, relation.partner.id]
+                                .sort()
+                                .join("_");
+
+                        if (drawnRelations.includes(relationKey)) {
+                            return;
+                        }
+
+                        drawnRelations.push(relationKey);
+
+                        var personId =
+                            person.id.replace(/@/g, "");
+
+                        var partnerId =
+                            relation.partner.id.replace(/@/g, "");
+
+                        var relationDot =
+                            `RelationDot_${personId}_${partnerId}`;
+
+                        // ------------------------------------------------
+                        // SPOUSE LAYOUT
+                        // ------------------------------------------------
+
+                        dot += `{rank=same;Person_${personId};${relationDot};Person_${partnerId}}` + `\n`;
+
+                        dot +=
+                            `Person_${personId} -> ${relationDot} -> Person_${partnerId}` +
+                            `\n`;
+
+                        // ------------------------------------------------
+                        // CHILDREN
+                        // ------------------------------------------------
+
+                        if (relation.children &&
+                            relation.children.length > 0) {
+
+                            relation.children.forEach(function(child, y) {
+
+                                if (!child || !child.id) {
+                                    return;
+                                }
+
+                                var childId =
+                                    child.id.replace(/@/g, "");
+
+                                var childDot =
+                                    `ChildDot_${personId}_${partnerId}_${childId}`;
+
+                                dot +=
+                                    `${relationDot} -> ${childDot}` +
+                                    `\n`;
+
+                                dot +=
+                                    `${childDot} -> Person_${childId}` +
+                                    `\n`;
+                            });
+                        }
+                    });
+                });
+
+
+
+
+
+
+
+
+
+
+
+                dotToPrint += `}`;
+                // Render dot graph
+                hpccWasm.graphviz.layout(dotToPrint, "svg", "dot", {
+                    images:
+                        [
+                            { path: "img/unknown.png", width: "512px", height: "682px" },
+                            { path: "img/tree-spouse.png", width: "16px", height: "16px" },
+                            { path: "img/tree-spouse-children.png", width: "16px", height: "16px" },
+                            { path: "img/tree-children.png", width: "16px", height: "16px" }
+                        ]
+                }).then(function (svg) {
+                    const printWindow = window.open("", "_blank");
+                    printWindow.document.title = "Family tree";
+                    if(!printWindow){
+                        alert("Popups are blocked. Please allow them before starting the print.");
+                    }
+
+                    // initialize svg element
+                    const container = printWindow.document.createElement('div');
+                    container.innerHTML = svg;
+                    printWindow.document.body.appendChild(container);
+
+                    setTimeout(function() {
+                        printWindow.focus();
+                        printWindow.print();
+                    }, 500);
+
                 }).catch(function (err) {
                     console.error(err.message)
                 });
