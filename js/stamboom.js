@@ -547,22 +547,12 @@ var Stamboom = (function() {
                             { path: "img/tree-children.png", width: "16px", height: "16px" }
                         ]
                 }).then(function (svg) {
-                    const printWindow = window.open("", "_blank");
-                    printWindow.document.title = "Family tree";
-                    if(!printWindow){
-                        alert("Popups are blocked. Please allow them before starting the print.");
-                    }
-
-                    // initialize svg element
-                    const container = printWindow.document.createElement('div');
-                    container.innerHTML = svg;
-                    printWindow.document.body.appendChild(container);
-
-                    setTimeout(function() {
-                        printWindow.focus();
-                        printWindow.print();
-                    }, 500);
-
+                    const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+                    const svgUrl = URL.createObjectURL(blob);
+                    var downloadLink = document.createElement("a");
+                    downloadLink.href = svgUrl;
+                    downloadLink.download = "family-tree.svg";
+                    downloadLink.click();
                 }).catch(function (err) {
                     console.error(err.message)
                 });
@@ -616,6 +606,24 @@ var Stamboom = (function() {
                 } catch {
                     return null;
                 }
+            }
+
+            function printSvg(svg){
+                const printWindow = window.open("", "_blank");
+                printWindow.document.title = "Family tree";
+                if(!printWindow){
+                    alert("Popups are blocked. Please allow them before starting the print.");
+                }
+
+                // initialize svg element
+                const container = printWindow.document.createElement('div');
+                container.innerHTML = svg;
+                printWindow.document.body.appendChild(container);
+
+                setTimeout(function() {
+                    printWindow.focus();
+                    printWindow.print();
+                }, 500);
             }
 
 	return Stamboom;
