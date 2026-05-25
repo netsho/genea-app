@@ -133,8 +133,8 @@ var Stamboom = (function() {
                 onselectCallback = callback;
             }
 
-            Stamboom.prototype.printTree = function(){
-                printTree();
+            Stamboom.prototype.downloadTree = function(){
+                downloadTree();
             }
 
             // Private methods
@@ -391,7 +391,7 @@ var Stamboom = (function() {
                 });
             }
 
-            function printTree() {  
+            function downloadTree() {  
                 // Node drawing
                 var node = {
                     draw: function(person) {
@@ -415,15 +415,10 @@ var Stamboom = (function() {
                     label: function(person) {
                         // Format name and split over multiple lines
                         var maxLength = 15;
-                        if (!person.name) {
-                            person.name = "";
-                        }
-                        if(!person.birth){
-                            person.birth = "";
-                        }
-                        if(!person.death){
-                            person.death = "";
-                        }
+                        if (!person.name) person.name = "";
+                        if(!person.birth) person.birth = "";
+                        if(!person.death) person.death = "";
+
                         var parts = person.name.split(" ");
                         var birthAndDeath = `${parseDate(person.birth).getFullYear() || "?"} - ${parseDate(person.death).getFullYear() || ""}`;
                         var output = [""];
@@ -483,7 +478,7 @@ var Stamboom = (function() {
                 // Dot graph definition              
                 var dotToPrint =
                     `digraph G {` + `\n` +
-                    `graph [nodesep=0.15,splines=ortho,ranksep=0.35]` + `\n` +
+                    `graph [nodesep=0.15,splines=polyline,ranksep=0.35]` + `\n` +
                     `node [shape=box,fontname=Helvetica,fontsize=8,fixedsize=true,width=1.7,height=0.75,style=filled]` + `\n`;
                 
                 // Draw each person
@@ -501,6 +496,7 @@ var Stamboom = (function() {
 
                 dotToPrint += `\n// ----- Relations -----\n`;
                 var drawnRelations = [];
+
                 persons.forEach(function(person) {
                     if (!person || !person.id) return;
                     var relations = gedcom.relations(person.id);
@@ -508,6 +504,7 @@ var Stamboom = (function() {
 
                     relations.forEach(function(relation, x) {
                         if (!relation.partner || !relation.partner.id) return;
+
                         // Prevent duplicate couple rendering
                         var personId = getId(person.id);
                         var partnerId = getId(relation.partner.id);
@@ -515,7 +512,8 @@ var Stamboom = (function() {
                         if (drawnRelations.includes(relationKey)) return;
                         drawnRelations.push(relationKey);
 
-                        var relationDot = `Relation${relationKey}Dot_${personId}_${partnerId}`;
+                        //var relationDot = `Relation${relationKey}Dot_${personId}_${partnerId}`;
+                        var relationDot = `Relation${relationKey}Dot`;
                         // Draw spouses next to each other
                         dotToPrint += `{rank=same;Person_${personId};${relationDot};Person_${partnerId}}` + `\n`;
                         dotToPrint += `Person_${personId} -> ${relationDot} -> Person_${partnerId}` + `\n`;
@@ -546,8 +544,23 @@ var Stamboom = (function() {
                             { path: "img/tree-spouse-children.png", width: "16px", height: "16px" },
                             { path: "img/tree-children.png", width: "16px", height: "16px" }
                         ]
-                }).then(function (svg) {
-                    const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+                }).then(async function (svg) {
+                    imagesToEmbed = [
+                        "img/unknown.png",
+                        "img/tree-spouse.png",
+                        "img/tree-spouse-children.png",
+                        "img/tree-children.png"
+                    ];
+
+                    let embeddedSvg = svg;
+                    for (const image of imagesToEmbed){
+                        if(embeddedSvg.includes(image)) {
+                            const base64Image = await toBase64(image);
+                            embeddedSvg = embeddedSvg.split(image).join(base64Image);
+                        }
+                    }
+                    
+                    const blob = new Blob([embeddedSvg], { type: "image/svg+xml;charset=utf-8" });
                     const svgUrl = URL.createObjectURL(blob);
                     var downloadLink = document.createElement("a");
                     downloadLink.href = svgUrl;
@@ -624,6 +637,21 @@ var Stamboom = (function() {
                     printWindow.focus();
                     printWindow.print();
                 }, 500);
+            }
+
+            async function toBase64(url){
+                try {
+                    const response = await fetch(url);
+                    const blob = await response.blob();
+                    return new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result);
+                        reader.readAsDataURL(blob);
+                    });
+                } catch (e){
+                    console.error("Failed to fetch image for embedding: " + url, e);
+                    return url; // fallback to original path if fetch failed
+                }
             }
 
 	return Stamboom;

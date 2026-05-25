@@ -5,7 +5,7 @@ Vue.component('tree', {
                 <div id="tree"></div>
             </div>
             <div style="position: fixed; bottom: 45px; right: 24px;">
-                <button v-on:click="printTree()" class="btn modal-trigger btn-floating btn-large waves-effect waves-light blue"><i class="material-icons">print</i></button>
+                <button v-on:click="downloadTree()" class="btn modal-trigger btn-floating btn-large waves-effect waves-light blue"><i class="material-icons">download</i></button>
                 <button v-on:click="addPerson()" class="btn modal-trigger btn-floating btn-large waves-effect waves-light red"><i class="material-icons">add</i></button>
             </div>
         </div>
@@ -44,8 +44,8 @@ Vue.component('tree', {
         addPerson: function() {
             this.$parent.$refs.modalNewPerson.open();
         },
-        printTree: function(){
-            stamboom.printTree();
+        downloadTree: function(){
+            stamboom.downloadTree();
         }
     }
 });
