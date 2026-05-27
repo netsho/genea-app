@@ -7,6 +7,7 @@ Genea allows visually building and editing a family tree online. It consumes and
 * Containerfile (Dockerfile equivalent but platform-agnostic) & podman-compose file.
   * `podman build -t genea-app .` 
 * Load GEDCOM mounted file. The folder containing the file must be mounted when running the container.
+* Fix relationship finder clearing results when the field is empty.
 * Add date and place of birth fields when adding a new person.
 * Gender selection is no longer a field but a choice button.
 * Birth and death dates are visible in the tree.
