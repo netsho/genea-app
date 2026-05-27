@@ -6,9 +6,24 @@ Genea allows visually building and editing a family tree online. It consumes and
 
 * Containerfile (Dockerfile equivalent but platform-agnostic) & podman-compose file.
   * `podman build -t genea-app .` 
-* Load GEDCOM mounted file. The file is in mounted folder in podman-compose.
+* Load GEDCOM mounted file. The folder containing the file must be mounted when running the container.
+* Add date and place of birth fields when adding a new person.
+* Gender selection is no longer a field but a choice button.
+* Birth and death dates are visible in the tree.
+* Save to git or load from git is fixed.
+* Download the whole tree (assisted by AI). The downloaded tree isn't as well drawn as the main tree. Accepting help on this feature.
+* Updated tests to reflect new changes.
+* Published docker image.
 
-Automatically saving the mounted GEDCOM file is not possible. As an alternative, download the file and manually copy it to the mounted folder.
+Automatically saving the mounted GEDCOM file is not possible. As an alternative, either download the file and manually copy it to the mounted folder or use git.
+
+# Docker usage
+Start genea container using this command:
+`docker run -d --name genea-app -p 8080:80 -v /path/to/your/data:/usr/share/nginx/html/data:ro ghcr.io/netsho/genea-app:latest`
+
+Then open in your browser `http://localhost:8080`
+
+The mounted directory must contain your GEDCOM file named `genea.app.ged`.
 
 # Demo
 
