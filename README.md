@@ -18,10 +18,13 @@ Genea allows visually building and editing a family tree online. It consumes and
 Automatically saving the mounted GEDCOM file is not possible. As an alternative, either download the file and manually copy it to the mounted folder or use git.
 
 # Docker usage
-Start genea container using this command:
-`docker run -d --name genea-app -p 8080:80 -v /path/to/your/data:/usr/share/nginx/html/data:ro ghcr.io/netsho/genea-app:latest`
+Start genea container using this command (either with docker or podman):
+```
+podman run -d --name genea-app -p 3010:3010 -v /path/to/your/data:/usr/share/nginx/html/data:ro ghcr.io/netsho/genea-app:latest
+```
+Alternatively, use the provided [podman-compose.yml](https://github.com/netsho/genea-app/blob/main/podman-compose.yml) from the Git repository.
 
-Then open in your browser `http://localhost:8080`
+Then open `http://localhost:8080` in your browser.
 
 The mounted directory must contain your GEDCOM file named `genea.app.ged`.
 
